@@ -3,12 +3,49 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { Timer } from 'three/addons/misc/Timer.js'
 import GUI from 'lil-gui'
 import { Sky } from 'three/addons/objects/Sky.js'
+import {Pane} from 'tweakpane'
+import { label } from 'three/tsl'
+import { MathUtils, Vector3 } from 'three';
 
 /**
  * Base
  */
 // Debug
-const gui = new GUI()
+const pane = new Pane({ title: 'GUI Manipulation', expanded:false });
+const Ambientlight = pane.addFolder({ title: 'Ambient Light', expanded: false });
+const Directionallight = pane.addFolder({ title: 'Directional Light', expanded: false });
+const Bulblight = pane.addFolder({ title: 'Bulb (Point) Light', expanded: false });
+const fog = pane.addFolder({ title: 'Fog', expanded: false });
+const extras = pane.addFolder({ title: 'Extras', expanded: false });
+const ssky = pane.addFolder({ title: 'Sky', expanded: false });
+const Tweakpane = {
+    directionallightIntensity: 1,
+    directionalLightColor: '#86cdff',
+    bulblight : '#ff7d46',
+    bulblightintensity: 5,
+    directionalLightPosition: {
+        x: 5,
+        y: 5,
+        z: 5
+    },
+    ambientLightIntensity: 0.275,
+    ambientlightColor: '#86cdff',
+    showHangingMan: true,
+    showSmoke: true,
+    gravesshow: true,
+    togglebulb: true,
+    toggleGhost1: true,
+    toggleGhost2: true,
+    toggleGhost3: true,
+    toggledirectionallight: true,
+    toggleambientlight: true,
+    togglefog: true,
+    turbidity: 15,         
+    rayleigh: 0.2,        
+    mieCoefficient: 0.08,   
+    mieDirectionalG: 0.99,   
+    fogdensity:0.05
+}
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -295,15 +332,15 @@ floor.rotation.x = -1.57
  * Lights
  */
 // Ambient light
-const ambientLight = new THREE.AmbientLight('#86cdff', 0.275)
+const ambientLight = new THREE.AmbientLight(Tweakpane.ambiantlightColor, Tweakpane.ambientLightIntensity)
 scene.add(ambientLight)
 
 // Directional light
-const directionalLight = new THREE.DirectionalLight('#86cdff', 1)
+const directionalLight = new THREE.DirectionalLight(Tweakpane.directionalLightColor, Tweakpane.directionallightIntensity)
 directionalLight.position.set(3, 2, -8)
 scene.add(directionalLight)
 
-const pointlight = new THREE.PointLight('#ff7d46', 5)
+const pointlight = new THREE.PointLight(Tweakpane.bulblight, Tweakpane.bulblightintensity)
 pointlight.position.set(0, 2.3, 2.3)
 house.add(pointlight)
 
@@ -362,15 +399,15 @@ blood.position.y = 0.925;
 blood.position.z = -0.01; 
 manGroup.add(blood);
 
-// const smileGeo = new THREE.TorusGeometry(0.05, 0.005, 8, 20, Math.PI); // Half ring (semicircle)
-// const smileMat = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Bright red
-// const smile = new THREE.Mesh(smileGeo, smileMat);
-// smile.rotation.x = Math.PI // Curve downwards (frown)
-// // smile.rotation.y = Math.PI / 8; // Face the front
-// // smile.rotation.z = Math.PI;
-// smile.position.set(0, 0.975, 0.09); // Slightly below eyes, front of face
-// manGroup.add(smile);
-// smile.position.y = 0.2
+const smileGeo = new THREE.TorusGeometry(0.05, 0.005, 8, 20, Math.PI); // Half ring (semicircle)
+const smileMat = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Bright red
+const smile = new THREE.Mesh(smileGeo, smileMat);
+smile.rotation.x = Math.PI // Curve downwards (frown)
+// smile.rotation.y = Math.PI / 8; // Face the front
+// smile.rotation.z = Math.PI;
+smile.position.set(0, 0.975, 0.09); // Slightly below eyes, front of face
+manGroup.add(smile);
+smile.position.y = 0.987
 // Body
 const bodyGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.5, 8);
 const bodyMat = new THREE.MeshStandardMaterial({ color: 0x5555ff });
@@ -512,31 +549,209 @@ sky.material.uniforms['mieCoefficient'].value = 0.1
 sky.material.uniforms['mieDirectionalG'].value = 0.95
 sky.material.uniforms['sunPosition'].value.set(0.3, -0.038, -0.95)
 
-scene.fog = new THREE.FogExp2('#04343f', 0.1)
-
-// const smokeParticles = []
-// const smokeCount = 30
-// const smokeGeometry = new THREE.SphereGeometry(0.06, 8, 8)
-// const smokeMaterial = new THREE.MeshStandardMaterial({
-//     color: 0xcccccc,
-//     transparent: true,
-//     opacity: 0.5
-// })
-
-// // Create smoke spheres and add to scene
-// for (let i = 0; i < smokeCount; i++) {
-//     const smoke = new THREE.Mesh(smokeGeometry, smokeMaterial.clone())
-//     smoke.position.set(
-//         1.2 + (Math.random() - 0.5) * 0.05,
-//         3.75 + i * 0.07,
-//         -1.2 + (Math.random() - 0.5) * 0.05
-//     )
-//     smoke.material.opacity = 0.5 - i * 0.012 // Fade out higher particles
-//     scene.add(smoke)
-//     smokeParticles.push(smoke)
-// }
+// scene.fog = new THREE.FogExp2('#04343f', 0.1)
+// scene.fog = new THREE.Fog(Tweakpane.fog, 1, 30); // purplish-black fog
+scene.fog = new THREE.FogExp2('#0a001a', Tweakpane.fogdensity); // start with some spooky fog
 
 
+
+//Tweakpane Tweaks and Object
+
+Ambientlight.addBinding(Tweakpane, 'ambientLightIntensity', {
+    label: 'Ambient Light Intensity',
+    min: -5,
+    max: 5,
+    step: 0.01
+}).on('change', () => {
+    ambientLight.intensity = Tweakpane.ambientLightIntensity;
+});
+
+Ambientlight.addBinding(Tweakpane, 'ambientlightColor', {
+    label: 'Ambient Light Color',
+    view: 'color',
+    color: { 'alpha': false }
+}).on('change', () => {
+    ambientLight.color.set(Tweakpane.ambientlightColor);
+});
+
+Ambientlight.addBinding(Tweakpane, 'toggleambientlight', {
+    label: 'Toggle Ambient Light'
+}).on('change', (ev) => {
+    ambientLight.visible = ev.value;
+})
+
+Directionallight.addBinding(Tweakpane, 'directionallightIntensity', {
+    label: 'Directional Light Intensity',
+    min: 0,
+    max: 5,
+    step: 0.01
+}).on('change', () => {
+    directionalLight.intensity = Tweakpane.directionallightIntensity;
+});
+
+Directionallight.addBinding(Tweakpane, 'directionalLightColor', {
+    label: 'Directional Light Color',
+    view: 'color',
+    color: { 'alpha': false }
+}).on('change', () => {
+    directionalLight.color.set(Tweakpane.directionalLightColor);
+});
+
+Directionallight.addBinding(Tweakpane.directionalLightPosition, 'x', {
+    min: -10,
+    max: 10,
+    step: 0.1,
+    label: 'Directional Light X'
+}).on('change', () => {
+    directionalLight.position.x = Tweakpane.directionalLightPosition.x;
+});
+
+Directionallight.addBinding(Tweakpane.directionalLightPosition, 'y', {
+    min: -10,
+    max: 10,
+    step: 0.1,
+    label: 'Directional Light Y'
+}).on('change', () => {
+    directionalLight.position.y = Tweakpane.directionalLightPosition.y;
+});
+
+Directionallight.addBinding(Tweakpane.directionalLightPosition, 'z', {
+    min: -10,
+    max: 10,
+    step: 0.1,
+    label: 'Directional Light Z'
+}).on('change', () => {
+    directionalLight.position.z = Tweakpane.directionalLightPosition.z;
+});
+
+Directionallight.addBinding(Tweakpane, 'toggledirectionallight', {
+    label: 'Toggle Directional Light'
+}).on('change', (ev) => {
+    directionalLight.visible = ev.value;
+})
+
+Bulblight.addBinding(Tweakpane, 'bulblightintensity', {
+    label: 'Bulb Light Intensity',
+    min: 0,
+    max: 10,
+    step: 0.01
+}).on('change', () => {
+    pointlight.intensity = Tweakpane.bulblightintensity;
+});
+
+Bulblight.addBinding(Tweakpane, 'bulblight', {
+    label: 'Bulb Light Color',
+    view: 'color',
+    color: { 'alpha': false }
+}).on('change', () => {
+    pointlight.color.set(Tweakpane.bulblight);
+}); 
+
+Bulblight.addBinding(Tweakpane, 'togglebulb', {
+    label: 'Toggle Bulb Light'
+}).on('change', (ev) => {
+    pointlight.visible = ev.value;
+})
+
+fog.addBinding(scene.fog, 'color', {
+    label: 'Fog Color',
+    view: 'color',
+    color: { alpha: false }
+}).on('change', () => {
+    scene.fog.color.set(scene.fog.color);
+})
+
+fog.addBinding(scene.fog, 'density', {
+    label: 'Fog Density',
+    min: 0,
+    max: 0.5,
+    step: 0.001
+}).on('change', () => {
+    scene.fog.density = scene.fog.density;
+});
+
+fog.addBinding(Tweakpane, 'togglefog', { label: 'Toggle Fog' }).on('change', (ev) => {
+  if (ev.value) {
+    scene.fog = new THREE.FogExp2('#0a001a', Tweakpane.fogdensity);
+  } else {
+    scene.fog = null;
+  }
+});
+
+ssky.addBinding(Tweakpane, 'turbidity', {
+    label: 'Sky Turbidity',
+    min: 0,
+    max: 20,
+    step: 0.1
+}).on('change', () => {
+    sky.material.uniforms['turbidity'].value = Tweakpane.turbidity;
+});
+
+ssky.addBinding(Tweakpane, 'rayleigh', {
+    label: 'Sky Rayleigh',
+    min: 0,
+    max: 20,
+    step: 0.01
+}).on('change', () => {
+    sky.material.uniforms['rayleigh'].value = Tweakpane.rayleigh;
+});
+
+ssky.addBinding(Tweakpane, 'mieCoefficient', {
+    label: 'Sky Mie Coefficient',
+    min: 0,
+    max: 1,
+    step: 0.001
+}).on('change', () => {
+    sky.material.uniforms['mieCoefficient'].value = Tweakpane.mieCoefficient;
+});
+
+ssky.addBinding(Tweakpane, 'mieDirectionalG', {
+    label: 'Sky Mie Directional G',
+    min: 0,
+    max: 1,
+    step: 0.001
+}).on('change', () => {
+    sky.material.uniforms['mieDirectionalG'].value = Tweakpane.mieDirectionalG;
+});
+
+
+extras.addBinding(Tweakpane, 'showHangingMan', {
+    label: 'Hide Hanging Man?'
+}).on('change', (ev) => {
+    wholesuicide.visible = ev.value;
+})
+
+extras.addBinding(Tweakpane, 'showSmoke',{
+    label: 'Hide Chimney Smoke?'
+}).on('change', (ev) => {
+    smokeGroup.visible = ev.value;
+})
+
+extras.addBinding(Tweakpane, 'gravesshow', {
+    label: 'Hide Graves?'
+}).on('change', (ev) => {
+    graves.forEach(grave => {
+        grave.visible = ev.value;
+    });
+});
+
+extras.addBinding(Tweakpane, 'toggleGhost1', {
+    label: 'Hide Ghost 1'
+}).on('change', (ev) => {
+    ghost1.visible = ev.value;
+});
+
+extras.addBinding(Tweakpane, 'toggleGhost2', {
+    label: 'Hide Ghost 2'
+}).on('change', (ev) => {
+    ghost2.visible = ev.value;
+});
+
+extras.addBinding(Tweakpane, 'toggleGhost3', {
+    label: 'Hide Ghost 3'
+}).on('change', (ev) => {
+    ghost3.visible = ev.value;
+});
 
 /**
  * Animate
