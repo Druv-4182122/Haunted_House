@@ -9,13 +9,13 @@
     "deploy": "vercel --prod"
   },
   "devDependencies": {
+    "vercel": "^44.4.1",
     "vite": "^6.2.2",
     "vite-plugin-restart": "^0.4.2"
   },
   "dependencies": {
     "lil-gui": "^0.20.0",
     "three": "^0.174.0",
-    "tweakpane": "^4.0.5",
-    "vercel": "^44.4.1"
+    "tweakpane": "^4.0.5"
   }
 }
