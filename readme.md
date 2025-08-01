@@ -1,29 +1,64 @@
-Haunted HouseA spooky and atmospheric 3D scene that transports you to a haunted house at dusk. This project showcases advanced Three.js features like dynamic lighting, fog effects, and a configurable environment, all designed to create a chilling experience.DemoFeaturesInteractive 3D Haunted House: Explore a chilling 3D scene with a detailed haunted house model.Dynamic Lighting: Manipulate ambient, directional, and point lights to set the mood.Atmospheric Fog: Control the fog color and density to create a mysterious and spooky environment.Configurable Elements: Toggle the visibility of ghosts, graves, a hanging man, and chimney smoke for a customized experience.Graphical User Interface (GUI): A comprehensive GUI for real-time control over all scene properties.Custom Models and Textures: The scene is built with custom 3D models and textures to enhance the aesthetic.Tech StackThis project leverages cutting-edge web technologies for an immersive 3D experience.Vite: Used for a lightning-fast development setup and optimized production builds.Three.js: The core library for all 3D rendering, lighting, and model management.GLSL: Custom shaders are used to create realistic effects like fog and atmospheric haze.lil-gui: A lightweight library that provides the GUI for scene manipulation.Getting StartedFollow these steps to get a local copy of the project up and running.PrerequisitesYou need to have Node.js installed on your machine.InstallationClone the repository:git clone https://github.com/your-username/haunted-house.git
-cd haunted-house
-Install dependencies:npm install
-Running LocallyTo start the development server and view the project in your browser, run the following command:npm run dev
-Build for ProductionTo create an optimized build of your project for deployment, use:npm run build
-The final output will be generated in the dist/ directory.Deployment on VercelThis project is configured for easy and reliable deployment on Vercel. The vercel.json file is crucial for correctly serving all project assets.vercel.json ConfigurationThe vercel.json file in this repository contains the necessary routing rules to ensure that all assets, including your compiled JavaScript files and your static models and textures, are served correctly without any errors.{
-  "version": 2,
-  "name": "Haunted House",
-  "buildCommand": "chmod +x node_modules/.bin/vite && npm run build",
-  "outputDirectory": "dist",
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "routes": [
-    {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
-    },
-    {
-      "src": "/(.*\\.(?:glb|gltf|bin|png|jpg|jpeg|svg|css|js|json|mp3|wav|ogg))",
-      "dest": "/static/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ]
-}
-This configuration prevents common deployment issues like "MIME type" and "SyntaxError" by ensuring all file types are served with the correct headers.I hope this helps you get your repository set up! It's a fantastic project, and I'm happy to help you document it.
+# 👻 Haunted House – Dynamic Lighting & Shaders
+
+🌐 **Live Demo**: [hauntedscene.vercel.app](https://hauntedscene.vercel.app/)
+
+This is a spooky, atmospheric real-time 3D scene built using **Three.js**. Featuring a haunted house, dynamic lighting, eerie volumetric fog, and real-time shader effects, this project showcases advanced 3D graphics and creative coding — all in the browser.
+
+---
+
+## ✨ Features
+
+- **🏚️ Haunted House Scene**  
+  A detailed haunted house model, crooked gravestones, and a hanging man set a chilling tone. Every asset is hand-placed for maximum creepiness.
+
+- **💡 Dynamic Lighting**  
+  Adjustable ambient, directional (moonlight), and point lights that cast shadows and change the mood dramatically.
+
+- **🌫️ Volumetric Fog**  
+  Shader-based fog system lets you control density and color for more depth and mystery.
+
+- **🎛 Real-Time GUI Control**  
+  Includes a lil-gui panel for adjusting scene properties (light, fog, etc.) in real time — no code required.
+
+- **⚡ Optimized for Performance**  
+  Built with performance in mind using efficient assets and shader code to run smoothly even with complex effects.
+
+---
+
+## 🖼 Preview
+
+![preview](image.png)*
+![Preview-2](image-1.png)
+
+---
+
+## 🛠️ Technologies Used
+
+- [Three.js](https://threejs.org/) – 3D rendering
+- [lil-gui](https://github.com/georgealways/lil-gui) – Real-time scene parameter controls
+- [Vite](https://vitejs.dev/) – Fast development and build tooling
+- [Vercel](https://vercel.com/) – Deployment platform
+
+---
+
+## 🚀 Getting Started
+
+### ✅ Prerequisites
+
+- [Node.js](https://nodejs.org/) installed
+
+### 📦 Installation
+
+1. Clone the repository  
+   ```bash
+   git clone https://github.com/Druv-4182122/Haunted_House.git
+   cd sunny-scene
+   ```
+
+2. Open Visual Studio Code run the following,
+    ```
+    npm install
+    ```
+    ```
+    npm run dev
+    ```
