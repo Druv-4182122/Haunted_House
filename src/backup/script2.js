@@ -8,10 +8,7 @@ import { label } from 'three/tsl'
 import { MathUtils, Vector3 } from 'three';
 import { LoadingManager } from 'three';
 
-// --- Get references to UI elements ---
-const instructionsScreen = document.getElementById('instructions-screen');
-const closeInstructionsBtn = document.getElementById('close-instructions-btn');
-const showInstructionsBtn = document.getElementById('show-instructions-btn'); // The new button
+// ...
 
 // Create a new LoadingManager
 const loadingManager = new THREE.LoadingManager();
@@ -19,34 +16,24 @@ const loadingScreen = document.getElementById('loading-screen');
 const loadingBar = document.querySelector('.loading-bar');
 
 loadingManager.onProgress = function(url, itemsLoaded, itemsTotal) {
+  // Update the progress bar's width
   const progress = (itemsLoaded / itemsTotal) * 100;
   loadingBar.style.width = `${progress}%`;
 };
 
 loadingManager.onLoad = function() {
+  // Fades out the loading screen once everything is loaded
   loadingScreen.classList.add('fade-out');
+
+  // Remove the loading screen from the DOM after the fade-out transition
   loadingScreen.addEventListener('transitionend', () => {
     loadingScreen.remove();
-    // Show instructions for the first time
-    instructionsScreen.classList.remove('hidden');
   });
 };
 
 loadingManager.onError = function(url) {
   console.error('There was an error loading ' + url);
 };
-
-// --- UI Event Listeners ---
-// Hides the instruction screen
-closeInstructionsBtn.addEventListener('click', () => {
-    instructionsScreen.classList.add('hidden');  
-});
-
-// Shows the instruction screen
-showInstructionsBtn.addEventListener('click', () => {
-    instructionsScreen.classList.remove('hidden');
-});
-
 
 /**
  * Base
@@ -60,12 +47,12 @@ const Bulblight = pane.addFolder({ title: 'Bulb (Point) Light', expanded: false 
 const fog = pane.addFolder({ title: 'Fog', expanded: false });
 const extras = pane.addFolder({ title: 'Extras', expanded: false });
 const ssky = pane.addFolder({ title: 'Sky', expanded: false });
-
+const cameraFolder = pane.addFolder({ title: 'Camera', expanded: false });
 const Tweakpane = {
-    directionallightIntensity: 2.50,
+    directionallightIntensity: 1,
     directionalLightColor: '#86cdff',
     bulblight : '#ff4646',
-    bulblightintensity: 10.00,
+    bulblightintensity: 2.47,
     directionalLightPosition: {
         x: 5,
         y: 5,
@@ -83,8 +70,8 @@ const Tweakpane = {
     toggledirectionallight: true,
     toggleambientlight: true,
     togglefog: true,
-    turbidity: 15,       
-    rayleigh: 0.2,       
+    turbidity: 15,         
+    rayleigh: 0.2,        
     mieCoefficient: 0.08,   
     mieDirectionalG: 0.99,   
     fogdensity:0.05,
@@ -92,33 +79,10 @@ const Tweakpane = {
 }
 
 // Canvas
-const canvas = document.querySelector('canvas.webgl')
+    const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
-
-// Raycaster for clicking on graves
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-
-window.addEventListener('click', (event) => {
-    // Calculate mouse position in normalized device coordinates (-1 to +1)
-    mouse.x = (event.clientX / sizes.width) * 2 - 1;
-    mouse.y = - (event.clientY / sizes.height) * 2 + 1;
-
-    // Update the picking ray with the camera and mouse position
-    raycaster.setFromCamera(mouse, camera);
-
-    // Calculate objects intersecting the picking ray
-    const intersects = raycaster.intersectObjects(graves);
-
-    if (intersects.length > 0) {
-        // An object was clicked, show the story modal and generate a story
-        storyModal.classList.remove('hidden');
-        generateSpookyStory();
-    }
-});
-
 
 const textureloader = new THREE.TextureLoader(loadingManager)
 
@@ -195,6 +159,12 @@ const doormetalnesstext = textureloader.load('./door/metalness.jpg')
 const doornormaltext = textureloader.load('./door/normal.jpg')
 const doorroughnesstext = textureloader.load('./door/roughness.jpg')
 
+// const chimneycolor = textureloader.load('./chimney/chimney_diff.jpg')
+// chimneycolor.colorSpace = THREE.SRGBColorSpace
+// const chimneyARM = textureloader.load('./chimney/chimney_arm.jpg')
+// const chimneynormal = textureloader.load('./chimney/chimney_nor_gl.jpg')
+// const chimneyheight = textureloader.load('./chimney/chimney_disp.jpg')
+// const chimneyao = textureloader.load('./chimney/chimney_ao.jpg')
 /**
  * House
  */
@@ -393,7 +363,7 @@ floor.rotation.x = -1.57
  * Lights
  */
 // Ambient light
-const ambientLight = new THREE.AmbientLight(Tweakpane.ambientlightColor, Tweakpane.ambientLightIntensity)
+const ambientLight = new THREE.AmbientLight(Tweakpane.ambiantlightColor, Tweakpane.ambientLightIntensity)
 scene.add(ambientLight)
 
 // Directional light
@@ -542,8 +512,8 @@ window.addEventListener('resize', () =>
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100);
 
 // 2. Set your desired default position and rotation
-camera.position.set(1.800, 1.718, 6.704);
-camera.rotation.set(-0.251, 0.254, 0.064);
+camera.position.set(-1.471, 2.289, 4.176);
+camera.rotation.set(-0.274, -0.433, -0.117);
 scene.add(camera);
 
 
@@ -567,7 +537,7 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap // default THREE.PCFShadowMap
 
 directionalLight.castShadow = true
 ghost1.castShadow = true
-ghost2.castShadow = true       
+ghost2.castShadow = true        
 ghost3.castShadow = true
 walls.castShadow = true
 roof.castShadow = true
@@ -886,10 +856,8 @@ const tick = () =>
     leftarm.rotation.x = Math.sin(time * 0.006) * 0.3;
     rightarm.rotation.x = Math.cos(time * 0.006) * 0.3;
 
- 
 
     controls.update();
- 
 
 
     // Render
@@ -901,3 +869,8 @@ const tick = () =>
 
 tick()
 setInterval(emitSmoke, 150) // emit smoke every 150ms
+
+
+
+
+
